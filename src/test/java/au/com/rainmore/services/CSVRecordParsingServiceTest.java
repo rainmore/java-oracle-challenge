@@ -1,6 +1,7 @@
 package au.com.rainmore.services;
 
 import au.com.rainmore.domains.CSVRecord;
+import au.com.rainmore.utils.ResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +24,7 @@ class CSVRecordParsingServiceTest {
 
     @Test
     void test_parseCSV_withValidInputStream() throws Exception {
-        Supplier<InputStream> inputStream = loadResource("test-csv-valid.csv");
+        Supplier<InputStream> inputStream = ResourceUtils.loadResource("test-csv-valid.csv");
         assertDoesNotThrow(() -> service.parseCSV(inputStream.get()));
         List<CSVRecord> CSVRecords = service.parseCSV(inputStream.get());
         assertEquals(5, CSVRecords.size());
@@ -31,7 +32,7 @@ class CSVRecordParsingServiceTest {
 
     @Test
     void test_parseCSV_withEmptyInput() throws Exception {
-        Supplier<InputStream> inputStream = loadResource("test-csv-empty.csv");
+        Supplier<InputStream> inputStream = ResourceUtils.loadResource("test-csv-empty.csv");
         assertDoesNotThrow(() -> service.parseCSV(inputStream.get()));
         List<CSVRecord> CSVRecords = service.parseCSV(inputStream.get());
         assertEquals(0, CSVRecords.size());
@@ -39,7 +40,7 @@ class CSVRecordParsingServiceTest {
 
     @Test
     void test_parseCSV_withInvalidInput() throws Exception {
-        Supplier<InputStream> inputStream = loadResource("test-csv-invalid.csv");
+        Supplier<InputStream> inputStream = ResourceUtils.loadResource("test-csv-invalid.csv");
         assertThrows(ParseException.class, () -> service.parseCSV(inputStream.get()));
     }
 
@@ -73,11 +74,6 @@ class CSVRecordParsingServiceTest {
 3244132,2346,eu_west,YellowTeam3,ProjectEgg,4122s
                 """.trim();
         assertThrows(ParseException.class, () -> service.parseCSV(string));
-    }
-
-
-    private Supplier<InputStream> loadResource(String fileName) {
-        return () -> getClass().getClassLoader().getResourceAsStream(fileName);
     }
 
 }
