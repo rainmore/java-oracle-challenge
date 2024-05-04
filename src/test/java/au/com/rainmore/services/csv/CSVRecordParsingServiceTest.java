@@ -1,4 +1,4 @@
-package au.com.rainmore.services;
+package au.com.rainmore.services.csv;
 
 import au.com.rainmore.domains.CSVRecord;
 import au.com.rainmore.utils.ResourceUtils;
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CSVRecordParsingServiceTest {
 
-    private CSVRecordParsingService     service;
+    private CSVRecordParsingService service;
 
     @BeforeEach
     void setUp() {
