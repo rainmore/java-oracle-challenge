@@ -4,10 +4,10 @@ import au.com.rainmore.domains.CSVRecord;
 import au.com.rainmore.domains.GeoZone;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class CSVRecordsService {
 
@@ -16,17 +16,11 @@ public class CSVRecordsService {
      * @return The number of unique customerId for each contractId
      */
     public Map<Long, Integer> countCustomerIdByContractId(List<CSVRecord> csvRecords) {
-        Map<Long, Integer> result = new HashMap<>();
-        for (Map.Entry<Long, Set<Long>> entry:  groupCustomerIdByContractId(csvRecords).entrySet()) {
-            result.put(entry.getKey(), entry.getValue().size());
-        }
-        return result;
-    }
-
-    private Map<Long, Set<Long>> groupCustomerIdByContractId(List<CSVRecord> csvRecords) {
-        Map<Long, Set<Long>> result = new HashMap<>();
-
-        return result;
+        return csvRecords.stream().collect(Collectors.groupingBy(
+                CSVRecord::getContractId,
+                Collectors.collectingAndThen(
+                        Collectors.mapping(CSVRecord::getCustomerId, Collectors.toSet()),
+                        Set::size)));
     }
 
     /**
@@ -34,8 +28,9 @@ public class CSVRecordsService {
      * @return The list of unique customerId for each GeoZone
      */
     public Map<GeoZone, Set<Long>> groupCustomerIdByGeoZone(List<CSVRecord> csvRecords) {
-        Map<GeoZone, Set<Long>> result = new HashMap<>();
-        return result;
+        return csvRecords.stream().collect(Collectors.groupingBy(
+                CSVRecord::getGeoZone,
+                Collectors.mapping(CSVRecord::getCustomerId, Collectors.toSet())));
     }
 
     /**
@@ -43,17 +38,11 @@ public class CSVRecordsService {
      * @return The number of unique customerId for each GeoZone
      */
     public Map<GeoZone, Integer> countCustomerIdByGeoZone(List<CSVRecord> csvRecords) {
-        Map<GeoZone, Integer> result = new HashMap<>();
-        for (Map.Entry<GeoZone, Set<Long>> entry:  groupCustomerIdByGeoZone(csvRecords).entrySet()) {
-            result.put(entry.getKey(), entry.getValue().size());
-        }
-        return result;
-    }
-
-    private Map<GeoZone, Set<Duration>> groupDurationByGeoZone(List<CSVRecord> csvRecords) {
-        Map<GeoZone, Set<Duration>> result = new HashMap<>();
-
-        return result;
+        return csvRecords.stream().collect(Collectors.groupingBy(
+                CSVRecord::getGeoZone,
+                Collectors.collectingAndThen(
+                        Collectors.mapping(CSVRecord::getCustomerId, Collectors.toSet()),
+                        Set::size)));
     }
 
     /**
@@ -61,11 +50,20 @@ public class CSVRecordsService {
      * @return The average buildduration for each GeoZone
      */
     public Map<GeoZone, Duration> calculateAveDurationByGeoZone(List<CSVRecord> csvRecords) {
-        Map<GeoZone, Duration> result = new HashMap<>();
-        for (Map.Entry<GeoZone, Set<Duration>> entry:  groupDurationByGeoZone(csvRecords).entrySet()) {
-            // TODO
-        }
-        return result;
+        return csvRecords.stream().collect(Collectors.groupingBy(
+                CSVRecord::getGeoZone,
+                Collectors.collectingAndThen(
+                        Collectors.mapping(CSVRecord::getBuildDuration, Collectors.toSet()),
+                        set -> {
+                            if (set.isEmpty()) {
+                                return Duration.ZERO;
+                            }
+                            else {
+                                long sum = set.stream().mapToLong(Duration::toNanos).sum();
+                                return Duration.ofNanos(sum / set.size());
+                            }
+                        })
+                ));
     }
 
 }
