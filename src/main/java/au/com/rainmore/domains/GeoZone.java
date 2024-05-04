@@ -10,6 +10,11 @@ public enum GeoZone {
     // TODO to add the rest fields
     ;
 
+    @Override
+    public String toString() {
+        return name().toLowerCase();
+    }
+
     public static GeoZone fromString(String geoZoneString) {
         return Arrays.stream(GeoZone.values())
                 .filter(geoZone -> geoZone.name().equalsIgnoreCase(geoZoneString))

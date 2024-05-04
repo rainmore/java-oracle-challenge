@@ -35,4 +35,11 @@ class GeoZoneTest {
         assertNull(geoZone);
     }
 
+    @Test
+    void test_toString_returnsLowerCaseString() {
+        assertEquals("us_east", GeoZone.US_EAST.toString());
+        assertEquals("us_west", GeoZone.US_WEST.toString());
+        assertEquals("eu_west", GeoZone.EU_WEST.toString());
+    }
+
 }
